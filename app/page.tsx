@@ -72,7 +72,7 @@ export default function Home() {
 
   const handleLogin = async (data: FormData) => {
     try {
-      const response = await axios.post<AuthResponse>("http://localhost:4000/auth/login", {
+      const response = await axios.post<AuthResponse>("https://expenss-server.vercel.app/auth/login", {
         email: data.email,
         password: data.password,
       })
@@ -96,7 +96,7 @@ export default function Home() {
       throw new Error("Passwords do not match")
     }
     try {
-      const response = await axios.post<AuthResponse>("http://localhost:4000/auth/register", {
+      const response = await axios.post<AuthResponse>("https://expenss-server.vercel.app/auth/register", {
         email: data.email,
         password: data.password,
         name: data.name,
