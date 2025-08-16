@@ -77,7 +77,7 @@ export default function Home() {
         password: data.password,
       })
       if (response.data.success) {
-       
+        localStorage.setItem("jwt", response.data.token!)
         toast.success("Login successful!")
         router.push("/dashboard")
       } else {
