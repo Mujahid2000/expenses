@@ -1,8 +1,13 @@
+import { redirect } from "next/navigation"
 import { Button } from "./ui/button"
 
 export function Header() {
     const logout = () =>{
         localStorage.removeItem('jwt')
+    }
+
+    if(!localStorage.getItem('jwt')){
+      redirect('/')
     }
 
   return (
