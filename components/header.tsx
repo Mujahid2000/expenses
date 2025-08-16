@@ -32,14 +32,12 @@ useEffect(() => {
 
         <nav className="hidden md:flex items-center space-x-6" role="navigation">
           <p
-            
             className="text-sm cursor-pointer font-medium text-muted-foreground hover:text-foreground transition-colors"
             aria-label="Go to Dashboard"
           >
             Dashboard
           </p>
           <p
-           
             className="text-sm cursor-pointer font-medium text-muted-foreground hover:text-foreground transition-colors"
             aria-label="View Expenses"
           >
