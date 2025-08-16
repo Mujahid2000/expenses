@@ -6,11 +6,12 @@ import { AddExpenseForm } from "@/components/add-expense-form"
 import { ExpenseList } from "@/components/expense-list"
 import { DeleteConfirmationDialog } from "@/components/delete-confirmation-dialog"
 import { Dashboard } from "@/components/dashboard"
+import { useRouter } from "next/navigation"
 
 // Interface for the API response
 export interface ExpenseResponse {
   success: boolean
-  data: Expenses
+  data: Expenses[] // Updated to handle array response
 }
 
 // Interface for individual expense data
@@ -28,85 +29,107 @@ export interface Expenses {
 const API_BASE_URL = "https://expenss-server.vercel.app/expenses"
 
 export default function ExpenseTracker() {
+  const router = useRouter()
   const [expenses, setExpenses] = useState<Expenses[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [token , setToken] = useState<string | null>('')
   const [editingExpense, setEditingExpense] = useState<Expenses | null>(null)
-  const [deleteDialog, setDeleteDialog] = useState<{
-    open: boolean
-    expense: Expenses | null
-  }>({ open: false, expense: null })
+  const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; expense: Expenses | null }>({
+    open: false,
+    expense: null,
+  })
+
+useEffect(() => {
+    if (typeof window !== "undefined" && !localStorage.getItem("jwt")) {
+      router.push("/")
+    }
+  }, [router])
+
+  if(localStorage.getItem('jwt')){
+    const jwtToken = localStorage.getItem('jwt')
+    setToken(jwtToken)
+  }
+
+
 
   useEffect(() => {
     fetchExpenses()
   }, [])
 
-const fetchExpenses = async () => {
-  const token = localStorage.getItem("jwt");
 
-  if (!token) {
-    setError("No token found, please login");
-    console.error("No token found, please login");
-    return;
-  }
+  const fetchExpenses = async () => {
+    
 
-  try {
-    setLoading(true);
-    setError(null);
-
-    const response = await fetch(`${API_BASE_URL}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`, // ✅ attach JWT
-      },
-    });
-
-    if (!response.ok) {
-      if (response.status === 401) {
-        throw new Error("Unauthorized! Token may be expired. Please login again.");
-      }
-      throw new Error(`Failed to fetch expenses: ${response.statusText}`);
+    if (!token) {
+      setError("No token found, please login")
+      console.error("No token found, please login")
+      return
     }
 
-    const data = await response.json();
+    try {
+      setLoading(true)
+      setError(null)
 
-    console.log("API Response:", data);
+      const response = await fetch(`${API_BASE_URL}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, 
+        },
+      })
 
-    // If your backend returns { data: [...] }
-    setExpenses(data.data);
+      if (!response.ok) {
+        if (response.status === 401) {
+          setError("Unauthorized! Token may be expired. Please login again.")
+          localStorage.removeItem("jwt")
+          return
+        }
+        throw new Error(`Failed to fetch expenses: ${response.statusText}`)
+      }
 
-    // If your backend just returns [...]
-    // setExpenses(data);
+      const data = await response.json()
+      // console.log("API Response:", data)
 
-  } catch (err) {
-    setError(err instanceof Error ? err.message : "Failed to fetch expenses");
-    console.error("Error fetching expenses:", err);
-  } finally {
-    setLoading(false);
+      // Handle both { data: [...] } and [...] responses
+      setExpenses(Array.isArray(data) ? data : data.data || [])
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to fetch expenses")
+      console.error("Error fetching expenses:", err)
+    } finally {
+      setLoading(false)
+    }
   }
-};
-
 
   const handleAddExpense = async (newExpense: Omit<Expenses, "_id" | "createdAt" | "updatedAt" | "__v">) => {
-     const token = localStorage.getItem("jwt");
+   
+
+    if (!token) {
+      setError("No token found, please login")
+      return
+    }
 
     try {
       const response = await fetch(API_BASE_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`, // ✅ attach JWT
+          Authorization: `Bearer ${token}`, // ✅ attach JWT
         },
         body: JSON.stringify(newExpense),
       })
 
       if (!response.ok) {
+        if (response.status === 401) {
+          setError("Unauthorized! Token may be expired. Please login again.")
+          localStorage.removeItem("jwt")
+          return
+        }
         throw new Error(`Failed to create expense: ${response.statusText}`)
       }
 
       const createdExpense: ExpenseResponse = await response.json()
-      setExpenses((prev) => [...prev, createdExpense.data])
+      setExpenses((prev) => [...prev, createdExpense.data[0]]) // Adjust if data is an array
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create expense")
       console.error("Error creating expense:", err)
@@ -118,23 +141,34 @@ const fetchExpenses = async () => {
   }
 
   const handleUpdateExpense = async (updatedExpense: Expenses) => {
-     const token = localStorage.getItem("jwt");
+   
+
+    if (!token) {
+      setError("No token found, please login")
+      return
+    }
+
     try {
       const response = await fetch(`${API_BASE_URL}/${updatedExpense._id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`, // ✅ attach JWT
+          Authorization: `Bearer ${token}`, // ✅ attach JWT
         },
         body: JSON.stringify(updatedExpense),
       })
 
       if (!response.ok) {
+        if (response.status === 401) {
+          setError("Unauthorized! Token may be expired. Please login again.")
+          localStorage.removeItem("jwt")
+          return
+        }
         throw new Error(`Failed to update expense: ${response.statusText}`)
       }
 
       const updated: ExpenseResponse = await response.json()
-      setExpenses((prev) => prev.map((expense) => (expense._id === updated.data._id ? updated.data : expense)))
+      setExpenses((prev) => prev.map((expense) => (expense._id === updated.data[0]._id ? updated.data[0] : expense)))
       setEditingExpense(null)
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to update expense")
@@ -154,17 +188,28 @@ const fetchExpenses = async () => {
   }
 
   const confirmDelete = async () => {
-     const token = localStorage.getItem("jwt");
+   
+
+    if (!token) {
+      setError("No token found, please login")
+      return
+    }
+
     if (deleteDialog.expense) {
       try {
         const response = await fetch(`${API_BASE_URL}/${deleteDialog.expense._id}`, {
           method: "DELETE",
           headers: {
-             "Authorization": `Bearer ${token}`, // ✅ attach JWT
-          }
+            Authorization: `Bearer ${token}`, // ✅ attach JWT
+          },
         })
 
         if (!response.ok) {
+          if (response.status === 401) {
+            setError("Unauthorized! Token may be expired. Please login again.")
+            localStorage.removeItem("jwt")
+            return
+          }
           throw new Error(`Failed to delete expense: ${response.statusText}`)
         }
 
@@ -193,7 +238,6 @@ const fetchExpenses = async () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-
       <main className="container mx-auto px-4 py-8">
         {error && (
           <div className="mb-6 p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
@@ -203,12 +247,9 @@ const fetchExpenses = async () => {
             </button>
           </div>
         )}
-
         <div className="mb-8">
-          
           <Dashboard expenses={expenses} />
         </div>
-
         <div className="grid gap-8 lg:grid-cols-2">
           <AddExpenseForm
             onAddExpense={handleAddExpense}
@@ -216,13 +257,10 @@ const fetchExpenses = async () => {
             editingExpense={editingExpense}
             onCancelEdit={handleCancelEdit}
           />
-
           <div className="lg:col-span-1">
-            
             <ExpenseList expenses={expenses} onEditExpense={handleEditExpense} onDeleteExpense={handleDeleteExpense} />
           </div>
         </div>
-
         <DeleteConfirmationDialog
           open={deleteDialog.open}
           onOpenChange={(open) => setDeleteDialog({ open, expense: null })}
