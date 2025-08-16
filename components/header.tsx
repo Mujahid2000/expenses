@@ -31,20 +31,20 @@ useEffect(() => {
         </div>
 
         <nav className="hidden md:flex items-center space-x-6" role="navigation">
-          <a
-            href="/dashboard"
-            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+          <p
+            
+            className="text-sm cursor-pointer font-medium text-muted-foreground hover:text-foreground transition-colors"
             aria-label="Go to Dashboard"
           >
             Dashboard
-          </a>
-          <a
-            href="/expenses"
-            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+          </p>
+          <p
+           
+            className="text-sm cursor-pointer font-medium text-muted-foreground hover:text-foreground transition-colors"
             aria-label="View Expenses"
           >
             Expenses
-          </a>
+          </p>
           <Button onClick={handleLogout} aria-label="Logout">
             Logout
           </Button>
