@@ -37,11 +37,11 @@ const theme: Theme = {
   input: "border-green-400 bg-black text-green-400 focus:ring-green-400",
   themeButton: "bg-gray-800 hover:bg-gray-700 text-green-400",
 }
-
+// Form data types
 interface FormData {
   email: string
   password: string
-  name?: string // Optional for login
+  name?: string 
   confirmPassword?: string
 }
 
