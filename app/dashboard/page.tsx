@@ -33,77 +33,73 @@ export default function ExpenseTracker() {
   const [expenses, setExpenses] = useState<Expenses[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [token , setToken] = useState<string | null>('')
+  const [token, setToken] = useState<string | null>(null) // Initialize to null for "not loaded"
   const [editingExpense, setEditingExpense] = useState<Expenses | null>(null)
   const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; expense: Expenses | null }>({
     open: false,
     expense: null,
   })
 
-useEffect(() => {
-    if (typeof window !== "undefined" && !localStorage.getItem("jwt")) {
-      router.push("/")
-    }
-  }, [router])
-
-  if(localStorage.getItem('jwt')){
-    const jwtToken = localStorage.getItem('jwt')
-    setToken(jwtToken)
-  }
-
-
-
+  // Combined useEffect for token handling and redirect (runs only on client)
   useEffect(() => {
-    fetchExpenses()
-  }, [])
+    if (typeof window === 'undefined') return; // Extra safety, though useEffect already skips server
 
+    const jwt = localStorage.getItem('jwt');
+    if (!jwt) {
+      router.push('/');
+      return;
+    }
+
+    setToken(jwt);
+  }, [router]);
+
+  // Fetch expenses only after token is set
+  useEffect(() => {
+    if (token) {
+      fetchExpenses();
+    }
+  }, [token]);
 
   const fetchExpenses = async () => {
-    
-
     if (!token) {
-      setError("No token found, please login")
-      console.error("No token found, please login")
-      return
+      setError("No token found, please login");
+      console.error("No token found, please login");
+      setLoading(false); // Ensure loading ends even on error
+      return;
     }
 
     try {
-      setLoading(true)
-      setError(null)
+      setLoading(true);
+      setError(null);
 
       const response = await fetch(`${API_BASE_URL}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, 
+          Authorization: `Bearer ${token}`,
         },
-      })
+      });
 
       if (!response.ok) {
         if (response.status === 401) {
-          setError("Unauthorized! Token may be expired. Please login again.")
-          localStorage.removeItem("jwt")
-          return
+          setError("Unauthorized! Token may be expired. Please login again.");
+          localStorage.removeItem("jwt");
+          return;
         }
-        throw new Error(`Failed to fetch expenses: ${response.statusText}`)
+        throw new Error(`Failed to fetch expenses: ${response.statusText}`);
       }
 
-      const data = await response.json()
-      // console.log("API Response:", data)
-
-      // Handle both { data: [...] } and [...] responses
-      setExpenses(Array.isArray(data) ? data : data.data || [])
+      const data = await response.json();
+      setExpenses(Array.isArray(data) ? data : data.data || []);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to fetch expenses")
-      console.error("Error fetching expenses:", err)
+      setError(err instanceof Error ? err.message : "Failed to fetch expenses");
+      console.error("Error fetching expenses:", err);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleAddExpense = async (newExpense: Omit<Expenses, "_id" | "createdAt" | "updatedAt" | "__v">) => {
-   
-
     if (!token) {
       setError("No token found, please login")
       return
@@ -141,8 +137,6 @@ useEffect(() => {
   }
 
   const handleUpdateExpense = async (updatedExpense: Expenses) => {
-   
-
     if (!token) {
       setError("No token found, please login")
       return
@@ -188,8 +182,6 @@ useEffect(() => {
   }
 
   const confirmDelete = async () => {
-   
-
     if (!token) {
       setError("No token found, please login")
       return
@@ -222,13 +214,14 @@ useEffect(() => {
     }
   }
 
-  if (loading) {
+  // Add a check for token === null (initial client load state)
+  if (token === null || loading) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
         <main className="container mx-auto px-4 py-8">
           <div className="flex items-center justify-center h-64">
-            <div className="text-lg text-muted-foreground">Loading expenses...</div>
+            <div className="text-lg text-muted-foreground">Loading...</div>
           </div>
         </main>
       </div>
