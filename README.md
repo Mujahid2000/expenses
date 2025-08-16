@@ -1,6 +1,6 @@
 ----Frontend Code------ 
 step 1: open you terminal from your working folder directory 
-# step 2: clone the git repository 
+step 2: clone the git repository 
 # step 3: type cd expenses 
 # step 5: type npm install 
 # step 7: type code . 
