@@ -8,10 +8,10 @@ import { DeleteConfirmationDialog } from "@/components/delete-confirmation-dialo
 import { Dashboard } from "@/components/dashboard"
 import { useRouter } from "next/navigation"
 
-// Interface for the API response
+// Interface for the API response (updated to allow data as array or single object)
 export interface ExpenseResponse {
   success: boolean
-  data: Expenses[] // Updated to handle array response
+  data: Expenses[] | Expenses // Flexible for list vs. single
 }
 
 // Interface for individual expense data
@@ -125,7 +125,7 @@ export default function ExpenseTracker() {
       }
 
       const createdExpense: ExpenseResponse = await response.json()
-      setExpenses((prev) => [...prev, createdExpense.data[0]]) // Adjust if data is an array
+      setExpenses((prev) => [...prev, createdExpense.data as Expenses]) // Treat data as single object
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create expense")
       console.error("Error creating expense:", err)
@@ -162,7 +162,7 @@ export default function ExpenseTracker() {
       }
 
       const updated: ExpenseResponse = await response.json()
-      setExpenses((prev) => prev.map((expense) => (expense._id === updated.data[0]._id ? updated.data[0] : expense)))
+      setExpenses((prev) => prev.map((expense) => (expense._id === (updated.data as Expenses)._id ? updated.data as Expenses : expense)))
       setEditingExpense(null)
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to update expense")

@@ -43,15 +43,15 @@ export function Dashboard({ expenses = [] }: DashboardProps) {
 
   // Calculate totals
   const totalExpenses = Array.isArray(expenses)
-    ? expenses.reduce((sum, expense) => sum + expense.amount, 0)
+    ? expenses.reduce((sum, expense) => sum + expense?.amount, 0)
     : 0
-  const totalTransactions = Array.isArray(expenses) ? expenses.length : 0
+  const totalTransactions = Array.isArray(expenses) ? expenses?.length : 0
 
   // Calculate category breakdowns
   const categoryTotals = Array.isArray(expenses)
     ? expenses.reduce(
         (acc, expense) => {
-          acc[expense.category] = (acc[expense.category] || 0) + expense.amount
+          acc[expense?.category] = (acc[expense?.category] || 0) + expense?.amount
           return acc
         },
         {} as Record<string, number>,
@@ -63,12 +63,12 @@ export function Dashboard({ expenses = [] }: DashboardProps) {
   const currentYear = new Date().getFullYear()
   const currentMonthExpenses = Array.isArray(expenses)
     ? expenses.filter((expense) => {
-        const expenseDate = new Date(expense.date)
+        const expenseDate = new Date(expense?.date)
         return expenseDate.getMonth() === currentMonth && expenseDate.getFullYear() === currentYear
       })
     : []
   const monthlyTotal = Array.isArray(currentMonthExpenses)
-    ? currentMonthExpenses.reduce((sum, expense) => sum + expense.amount, 0)
+    ? currentMonthExpenses.reduce((sum, expense) => sum + expense?.amount, 0)
     : 0
 
   // Calculate average per transaction
@@ -84,7 +84,7 @@ export function Dashboard({ expenses = [] }: DashboardProps) {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-primary">${totalExpenses.toFixed(2)}</div>
+            <div className="text-2xl font-bold text-primary">${totalExpenses?.toFixed(2)}</div>
             <p className="text-xs text-muted-foreground">All time total</p>
           </CardContent>
         </Card>
@@ -95,7 +95,7 @@ export function Dashboard({ expenses = [] }: DashboardProps) {
             <CalendarDays className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-foreground">${monthlyTotal.toFixed(2)}</div>
+            <div className="text-2xl font-bold text-foreground">${monthlyTotal?.toFixed(2)}</div>
             <p className="text-xs text-muted-foreground">{currentMonthExpenses.length} transactions</p>
           </CardContent>
         </Card>
@@ -117,7 +117,7 @@ export function Dashboard({ expenses = [] }: DashboardProps) {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-foreground">${averagePerTransaction.toFixed(2)}</div>
+            <div className="text-2xl font-bold text-foreground">${averagePerTransaction?.toFixed(2)}</div>
             <p className="text-xs text-muted-foreground">Per transaction</p>
           </CardContent>
         </Card>
@@ -151,8 +151,8 @@ export function Dashboard({ expenses = [] }: DashboardProps) {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold text-foreground">${(amount as number).toFixed(2)}</p>
-                      <p className="text-xs text-muted-foreground">{percentage.toFixed(1)}%</p>
+                      <p className="font-semibold text-foreground">${(amount as number)?.toFixed(2)}</p>
+                      <p className="text-xs text-muted-foreground">{percentage?.toFixed(1)}%</p>
                     </div>
                   </div>
                 )

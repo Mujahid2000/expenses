@@ -45,7 +45,7 @@ export function ExpenseList({ expenses, onEditExpense, onDeleteExpense }: Expens
       day: "numeric",
     })
   }
-
+console.log(expenses)
   if (expenses.length === 0) {
     return (
       <Card className="bg-card border-border">
@@ -69,20 +69,20 @@ export function ExpenseList({ expenses, onEditExpense, onDeleteExpense }: Expens
       <CardContent>
         {/* Mobile Card Layout */}
         <div className="space-y-4 md:hidden">
-          {expenses.map((expense) => (
-            <div key={expense._id} className="border border-border rounded-lg p-4 bg-background">
+          {expenses.map((expense, ) => (
+            <div key={expense?._id} className="border border-border rounded-lg p-4 bg-background">
               <div className="flex items-start justify-between mb-2">
                 <div className="flex-1">
-                  <h3 className="font-medium text-foreground">{expense.title}</h3>
-                  <p className="text-sm text-muted-foreground">{formatDate(expense.date)}</p>
+                  <h3 className="font-medium text-foreground">{expense?.title}</h3>
+                  <p className="text-sm text-muted-foreground">{formatDate(expense?.date)}</p>
                 </div>
                 <div className="text-right">
-                  <p className="font-semibold text-foreground">${expense.amount.toFixed(2)}</p>
+                  <p className="font-semibold text-foreground">${expense?.amount?.toFixed(2)}</p>
                 </div>
               </div>
 
               <div className="flex items-center justify-between">
-                <Badge className={getCategoryBadgeColor(expense.category)}>{expense.category}</Badge>
+                <Badge className={getCategoryBadgeColor(expense?.category)}>{expense?.category}</Badge>
 
                 <div className="flex space-x-2">
                   <Button
@@ -96,7 +96,7 @@ export function ExpenseList({ expenses, onEditExpense, onDeleteExpense }: Expens
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => onDeleteExpense?.(expense._id)}
+                    onClick={() => onDeleteExpense?.(expense?._id)}
                     className="h-8 w-8 p-0 hover:bg-destructive/10 hover:text-destructive"
                   >
                     <Trash2 className="h-4 w-4" />
@@ -121,14 +121,14 @@ export function ExpenseList({ expenses, onEditExpense, onDeleteExpense }: Expens
                 </tr>
               </thead>
               <tbody>
-                {expenses.map((expense) => (
-                  <tr key={expense._id} className="border-b border-border hover:bg-muted/50 transition-colors">
-                    <td className="py-3 px-2 font-medium text-foreground">{expense.title}</td>
-                    <td className="py-3 px-2 text-foreground">${expense.amount.toFixed(2)}</td>
+                {expenses.map((expense, index) => (
+                  <tr key={expense?._id} className="border-b border-border hover:bg-muted/50 transition-colors">
+                    <td className="py-3 px-2 font-medium text-foreground">{expense?.title}</td>
+                    <td className="py-3 px-2 text-foreground">${expense?.amount?.toFixed(2)}</td>
                     <td className="py-3 px-2">
-                      <Badge className={getCategoryBadgeColor(expense.category)}>{expense.category}</Badge>
+                      <Badge className={getCategoryBadgeColor(expense?.category)}>{expense?.category}</Badge>
                     </td>
-                    <td className="py-3 px-2 text-muted-foreground">{formatDate(expense.date)}</td>
+                    <td className="py-3 px-2 text-muted-foreground">{formatDate(expense?.date)}</td>
                     <td className="py-3 px-2">
                       <div className="flex justify-end space-x-2">
                         <Button
@@ -142,7 +142,7 @@ export function ExpenseList({ expenses, onEditExpense, onDeleteExpense }: Expens
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => onDeleteExpense?.(expense._id)}
+                          onClick={() => onDeleteExpense?.(expense?._id)}
                           className="h-8 w-8 p-0 hover:bg-destructive/10 hover:text-destructive"
                         >
                           <Trash2 className="h-4 w-4" />
