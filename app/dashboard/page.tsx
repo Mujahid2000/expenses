@@ -7,7 +7,7 @@ import { ExpenseList } from "@/components/expense-list"
 import { DeleteConfirmationDialog } from "@/components/delete-confirmation-dialog"
 import { Dashboard } from "@/components/dashboard"
 import { useRouter } from "next/navigation"
-
+export const dynamic = 'force-dynamic';
 // Interface for the API response (updated to allow data as array or single object)
 export interface ExpenseResponse {
   success: boolean
