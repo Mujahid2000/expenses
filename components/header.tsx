@@ -1,4 +1,10 @@
+import { Button } from "./ui/button"
+
 export function Header() {
+    const logout = () =>{
+        localStorage.removeItem('jwt')
+    }
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
@@ -16,6 +22,7 @@ export function Header() {
           <a href="#" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
             Expenses
           </a>
+          <Button onClick={logout}>Logout</Button>
         </nav>
       </div>
     </header>
